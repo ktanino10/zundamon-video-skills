@@ -1,8 +1,10 @@
 """Synthetic fixtures only: no character artwork, model or human voice is bundled."""
 from array import array
 import hashlib
+import json
 from pathlib import Path
 import struct
+import re
 import sys
 import tempfile
 import unittest
@@ -93,6 +95,29 @@ class AnimationTests(unittest.TestCase):
         self.assertEqual(eye_state(3.46), "closed")
         with self.assertRaises(ValueError):
             eye_state(-1)
+
+class SetupTests(unittest.TestCase):
+    def test_both_stdio_examples_disable_all_internal_player_tools(self):
+        text = (ROOT / "skills/zundamon-video/references/setup.md").read_text()
+        lines = re.search(r"```text\n(.*?)\n```", text, re.S).group(1).splitlines()
+        settings = json.loads(re.search(r"```json\n(.*?)\n```", text, re.S).group(1))
+        server = settings["mcpServers"]["voicevox"]
+        self.assertEqual(server["command"], "node")
+        self.assertEqual(server["args"], lines)
+        self.assertTrue(lines[0].endswith("/dist/stdio.js"))
+        self.assertEqual(lines[lines.index("--disable-groups") + 1], "player,dictionary,apps")
+        disabled = set(lines[lines.index("--disable-tools") + 1].split(","))
+        expected = {
+            "speak", "stop_speaker", "_add_user_dictionary_word_for_player",
+            "_delete_user_dictionary_word_for_player", "_export_tracks_for_player",
+            "_get_export_capability_for_player", "_get_player_state_for_player",
+            "_get_speaker_icon_for_player", "_get_speakers_for_player",
+            "_get_user_dictionary_for_player", "_preview_dictionary_word_for_player",
+            "_resynthesize_for_player", "_save_player_state_for_player",
+            "_select_directory_for_player", "_update_user_dictionary_word_for_player",
+        }
+        self.assertEqual(disabled, expected)
+        self.assertIn("`voicevox_ping`、`voicevox_get_speakers`、`voicevox_synthesize_file` の3つだけ", text)
 
 
 if __name__ == "__main__":

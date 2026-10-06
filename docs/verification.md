@@ -3,13 +3,14 @@
 ## 実行したもの
 
 - SKILL.mdのfrontmatter/name/description/compatibilityの形式検査
-- `tests/test_helpers.py`の7メソッド
+- `tests/test_helpers.py`の8メソッド
   - 自作2×2 pixel PSDの読取・保存mergedとの比較
   - PackBitsのliteral/repeat/no-op、欠落・サイズ超過の拒否
   - source hash違い、未対応blendの拒否
   - 合成PCMの音量に応じた口状態と無音時の閉口
   - 字幕領域との分離、画面下へ続かない胴体配置の拒否
   - まばたき状態と負時刻の拒否
+  - MCP0.8.1のstdio入口、内部player tools無効化、text/JSON例と3tool期待一覧の整合
 - 3つの代表依頼のinlineウォークスルー
 
 テストfixtureはプログラム内で作った一般的な画素・音であり、キャラクターの原画・モデル・人の録音は含まない。

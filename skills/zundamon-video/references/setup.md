@@ -42,7 +42,8 @@ npm install --save-exact @kajidog/mcp-tts-voicevox@0.8.1
 - `https://registry.npmjs.org/@kajidog/mcp-tts-voicevox/-/mcp-tts-voicevox-0.8.1.tgz`
 - SHA-256: `5dc7a993cae9721bde195fb904a820d1ebe7c2f39e2cabf62b51a6a0d010d1b8`
 - Node.js要件：`>=20.0.0`
-- 実行入口：`node_modules/@kajidog/mcp-tts-voicevox/dist/index.js`
+- packageのCLI入口：`node_modules/@kajidog/mcp-tts-voicevox/dist/index.js`
+- 下記のLocal/stdio専用入口：`node_modules/@kajidog/mcp-tts-voicevox/dist/stdio.js`
 - MCP実装のライセンス：ISC
 
 ### ファイル生成だけの設定例
@@ -50,17 +51,21 @@ npm install --save-exact @kajidog/mcp-tts-voicevox@0.8.1
 コマンドは`node`、引数は以下のように設定します。最初のパスは、自分がインストールした場所の絶対パスへ置き換えます。
 
 ```text
-/ABSOLUTE/PATH/voicevox-mcp-local/node_modules/@kajidog/mcp-tts-voicevox/dist/index.js
+/ABSOLUTE/PATH/voicevox-mcp-local/node_modules/@kajidog/mcp-tts-voicevox/dist/stdio.js
 --url
 http://127.0.0.1:50021
 --disable-groups
 player,dictionary,apps
 --disable-tools
-speak,stop_speaker
+speak,stop_speaker,_add_user_dictionary_word_for_player,_delete_user_dictionary_word_for_player,_export_tracks_for_player,_get_export_capability_for_player,_get_player_state_for_player,_get_speaker_icon_for_player,_get_speakers_for_player,_get_user_dictionary_for_player,_preview_dictionary_word_for_player,_resynthesize_for_player,_save_player_state_for_player,_select_directory_for_player,_update_user_dictionary_word_for_player
 --no-auto-play
 ```
 
-0.8.1では`--disable-groups`と`--disable-tools`がサポートされています。この例はプレーヤー・辞書・音声再生を使わず、ping/話者一覧/ファイル生成を目的とします。登録後に実際のtool一覧を確認し、意図しないtoolが残っていれば使わず設定を見直してください。
+0.8.1ではgroup無効化だけでは内部player toolsが残るため、上記では13個の内部名も明示的に無効化します。
+期待する公開tool一覧は **`voicevox_ping`、`voicevox_get_speakers`、`voicevox_synthesize_file` の3つだけ**です。
+この設定は0.8.1の配布sourceと、別環境で実施された無効化前後のMCP inventory確認に基づきます。
+このリポジトリのテストは両例の引数整合を検査するもので、利用者の環境での接続試験の代わりではありません。
+登録後の実一覧が3つと異なる場合は使用せず、版と引数を確認してください。内部toolを残したまま先へ進まないでください。
 
 この絞込みは、悪意あるコードを隔離するsandboxではありません。出力は自分で決めた新規作業フォルダに限定し、秘密・他人のファイル・既存音声を渡さないでください。
 
@@ -76,10 +81,10 @@ Copilot appのCustomizeからMCP server追加を開き、Local/stdioのサーバ
     "voicevox": {
       "command": "node",
       "args": [
-        "/ABSOLUTE/PATH/voicevox-mcp-local/node_modules/@kajidog/mcp-tts-voicevox/dist/index.js",
+        "/ABSOLUTE/PATH/voicevox-mcp-local/node_modules/@kajidog/mcp-tts-voicevox/dist/stdio.js",
         "--url", "http://127.0.0.1:50021",
         "--disable-groups", "player,dictionary,apps",
-        "--disable-tools", "speak,stop_speaker",
+        "--disable-tools", "speak,stop_speaker,_add_user_dictionary_word_for_player,_delete_user_dictionary_word_for_player,_export_tracks_for_player,_get_export_capability_for_player,_get_player_state_for_player,_get_speaker_icon_for_player,_get_speakers_for_player,_get_user_dictionary_for_player,_preview_dictionary_word_for_player,_resynthesize_for_player,_save_player_state_for_player,_select_directory_for_player,_update_user_dictionary_word_for_player",
         "--no-auto-play"
       ]
     }
